@@ -1,6 +1,6 @@
 package XML::ApacheFOP;
 use strict;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -8,18 +8,18 @@ XML::ApacheFOP - Access Apache FOP from Perl to create PDF files using XSL-FO.
 
 =head1 SYNOPSIS
 
-	use XML::ApacheFOP;
-	
-	my $Fop = XML::ApacheFOP->new();
-	
-	# create a PDF using a xml/xsl tranformation
-	$Fop->fop(xml=>"foo.xml", xsl=>"bar.xsl", outfile=>"temp1.pdf") or die "cannot create pdf: " . $Fop->errstr;
-	
-	# create a PDF using an xsl-fo file
-	$Fop->fop(fo=>"foo.fo", outfile=>"temp2.pdf") or die "cannot create pdf: " . $Fop->errstr;
-	
-	# create a PostScript file using an xsl-fo file
-	$Fop->fop(fo=>"foo.fo", outfile=>"temp3.ps", rendertype=>"ps") or die "cannot create ps file: " . $Fop->errstr;
+    use XML::ApacheFOP;
+    
+    my $Fop = XML::ApacheFOP->new();
+    
+    # create a PDF using a xml/xsl tranformation
+    $Fop->fop(xml=>"foo.xml", xsl=>"bar.xsl", outfile=>"temp1.pdf") || die "cannot create pdf: " . $Fop->errstr;
+    
+    # create a PDF using an xsl-fo file
+    $Fop->fop(fo=>"foo.fo", outfile=>"temp2.pdf") || die "cannot create pdf: " . $Fop->errstr;
+    
+    # create a PostScript file using an xsl-fo file
+    $Fop->fop(fo=>"foo.fo", outfile=>"temp3.ps", rendertype=>"ps") || die "cannot create ps file: " . $Fop->errstr;
 
 =head1 DESCRIPTION
 
@@ -38,15 +38,21 @@ See the L<"SEE ALSO"> section below for a download link.
 
 Once you have them installed, you will need to make a change to the JavaServer startup so that FOP will be accessible.
 The -classpath will need to be tailored to suit your system.
-Hopefully the following expample will help you get it right though. Here is the command I use:
+Hopefully the following example will help you get it right though. Here is the command I use:
 
-/path/to/java -classpath \
-/path/to/JavaServer.jar:/usr/local/xml-fop/build/fop.jar\
-:/usr/local/xml-fop/lib/avalon-framework-cvs-20020806.jar:/usr/local/xml-fop/lib/batik.jar\
-:/usr/local/xml-fop/lib/xalan-2.4.1.jar:/usr/local/xml-fop/lib/xercesImpl-2.2.1.jar \
-com.zzo.javaserver.JavaServer
+    /path/to/java -classpath \
+    /path/to/JavaServer.jar\
+    :/usr/local/xml-fop/build/fop.jar\
+    :/usr/local/xml-fop/lib/avalon-framework-cvs-20020806.jar\
+    :/usr/local/xml-fop/lib/batik.jar\
+    :/usr/local/xml-fop/lib/xalan-2.4.1.jar\
+    :/usr/local/xml-fop/lib/xercesImpl-2.2.1.jar \
+    com.zzo.javaserver.JavaServer
 
 Once your JavaServer is running you'll be ready to start using this module.
+
+The README file included with this distribution contains more help
+for getting this module setup.
 
 =head1 METHODS
 
@@ -63,37 +69,36 @@ It will die if it cannot connect to the JavaServer.
 The new call accepts a hash with the following keys:
 (note that many of these options are the same as those in Java.pm)
 
-	host => hostname of remote machine to connect to
-			default is 'localhost'
-			
-	port => port the JVM is listening on (JavaServer)
-			default is 2000
-			
-	event_port => port that the remote JVM will send events to
-			default is 2001.  If you specify '-1' for this
-			value then the event service will be turned off -
-			if you're not doing any GUI work this might be
-			a good idea as the second event port will NOT
-			get used/opened saving some system resources.
-			
-	authfile => The path to a file whose first line is used as a 
-			shared 'secret' which will be passed to 
-			JavaServer.  To use this feature you must start 
-			JavaServer with the '--authfile=<filename>' 
-			command-line option.
-			If the secret words match access will be granted
-			to this client.  By default there is no shared
-			secret.  See the 'Authorization' section in Java.pm docs for more info.
-			
-	debug => when set to true it will print various warn messages stating what
-			the module is doing. Default is false.
-			
-	allowed_paths => this is an array ref containing the allowed paths for any filename
-			passed to this module (such as xml, xsl, fo, or pdf filenames).
-			For example, if set to ['/home/foo'], then only files within
-			/home/foo or its children directories will be allowed. If any files
-			outside of this path are passed, the fop call will fail.
-			Default is undef, meaning files from anywhere are allowed.
+    host => hostname of remote machine to connect to
+                    default is 'localhost'
+                    
+    port => port the JVM is listening on (JavaServer)
+                    default is 2000
+                    
+    event_port => port that the remote JVM will send events to
+                    default is -1 (off)
+                    Since this module doesn't do any GUI work, leaving this
+                    off is a good idea as the second event port will NOT
+                    get used/opened saving some system resources.
+                    
+    authfile => The path to a file whose first line is used as a 
+                    shared 'secret' which will be passed to 
+                    JavaServer.  To use this feature you must start 
+                    JavaServer with the '--authfile=<filename>' 
+                    command-line option.
+                    If the secret words match access will be granted
+                    to this client.  By default there is no shared
+                    secret.  See the 'Authorization' section in Java.pm docs for more info.
+                    
+    debug => when set to true it will print various warn messages stating what
+                    the module is doing. Default is false.
+                    
+    allowed_paths => this is an array ref containing the allowed paths for any filename
+                    passed to this module (such as xml, xsl, fo, or pdf filenames).
+                    For example, if set to ['/home/foo'], then only files within
+                    /home/foo or its children directories will be allowed. If any files
+                    outside of this path are passed, the fop call will fail.
+                    Default is undef, meaning files from anywhere are allowed.
 
 =cut
 
@@ -113,7 +118,7 @@ sub _init
   
   $Self->{host} = $Args{host} ? $Args{host} : 'localhost';
   $Self->{port} = $Args{port} ? $Args{port} : 2000;
-  $Self->{event_port} = $Args{event_port} ? $Args{event_port} : 2001;
+  $Self->{event_port} = $Args{event_port} ? $Args{event_port} : -1;
   $Self->{authfile} = $Args{authfile} ? $Args{authfile} : undef; # see Authentication section in Java.pm documentation
   $Self->debug($Args{debug});
   # only allow input/output files to be from directories in these paths
@@ -153,30 +158,34 @@ This makes the actual call to FOP.
 
 The fop call accepts a hash with the following keys:
 
-	fo => path to the xsl-fo file, must I<not> be used with xml and xsl
-	
-	xml => path to the xml file, must be used together with xsl
-	xsl => path to xsl stylesheet, must be used together with xml
-	
-	outfile => filename to save the generated file as
-	
-	rendertype => the type of file that should be generated.
-		Default is pdf. Also supports the following formats:
-	
-		mif - will be rendered as mif file
-		pcl - will be rendered as pcl file
-		ps - will be rendered as PostScript file
-		txt - will be rendered as text file
-		svg - will be rendered as a svg slides file
-		at - representation of area tree as XML
-		
-	txt_encoding => if the 'txt' rendertype is used, this is the
-		output encoding used for the outfile.
-		The encoding must be a valid java encoding.
+    fo => path to the xsl-fo file, must I<not> be used with xml and xsl
+    
+    xml => path to the xml file, must be used together with xsl
+    xsl => path to xsl stylesheet, must be used together with xml
+    
+    outfile => filename to save the generated file as
+    
+    rendertype => the type of file that should be generated.
+            Default is pdf. Also supports the following formats:
+    
+            mif - will be rendered as mif file
+            pcl - will be rendered as pcl file
+            ps - will be rendered as PostScript file
+            txt - will be rendered as text file
+            svg - will be rendered as a svg slides file
+            at - representation of area tree as XML
+            
+    txt_encoding => if the 'txt' rendertype is used, this is the
+            output encoding used for the outfile.
+            The encoding must be a valid java encoding.
 
-	s => if the 'at' rendertype is used, setting this to true
-		will omit the tree below block areas.
-		
+    s => if the 'at' rendertype is used, setting this to true
+            will omit the tree below block areas.
+            
+    c => the path to an xml configuration file of options
+            such as baseDir, fontBaseDir, and strokeSVGText.
+            See http://xmlgraphics.apache.org/fop/configuration.html
+
 Will return 1 if the call is successfull.
 
 Will return undef if there was a problem.
@@ -254,6 +263,12 @@ sub fop
     push @Options, ('-s');
   }
   
+  # read in configuration file
+  if ($Args{'c'})
+  {
+    push @Options, ('-c',  $Args{'c'});
+  }
+  
   # if allowed_paths is set, verify that all files are in the given paths
   if ($Self->{allowed_paths})
   {
@@ -294,7 +309,7 @@ sub fop
   my $Options = $Self->{_java}->create_array("java.lang.String", $OptionsLength);
   for (my $Element = 0; $Element < $OptionsLength; $Element++)
   {
-     $Options->[$Element] = $Options[$Element];
+    $Options->[$Element] = $Options[$Element];
   }
   
   warn "creating fop object with options: @Options" if $Self->{debug};
@@ -310,7 +325,6 @@ sub fop
   
   # create the pdf file (or whatever rendering filetype was selected)
   warn "generating $RenderType file" if $Self->{debug};
-  my $Status;
   eval { $Starter->run() };
   return $Self->_eval_error("$RenderType file generation failed") if $@;
   
@@ -335,9 +349,24 @@ sub _error
 sub _eval_error
 {
   my $Self = shift;
-  $@ =~ s/^ERROR: //; # Gets rid of 'ERROR: '
-  $@ =~ s/org.apache.fop.apps.FOPException: //; # Gets rid of the fop class in the message
-  return $Self->_error("$_[0]: $@");
+
+  my $Error = $@;
+  chomp($Error);
+
+  # Gets rid of 'ERROR: '
+  $Error =~ s/^ERROR: //;
+
+  # Gets rid of the fop exception class in the message
+  $Error =~ s/org.apache.fop.apps.FOPException: //;
+
+  # Gets rid of 'croak' generated stuff
+  # I'm reversing the error string because the non-greedy *? only works from left-to-right
+  # If you have a better way to do this, let me know :)
+  $Error = reverse $Error;
+  $Error =~ s/^\d+ enil .*?(\/|[\/\\]:[a-zA-Z]) ta //;
+  $Error = reverse $Error;
+
+  return $Self->_error("$_[0]: $Error");
 }
 
 =head1 AUTHOR
@@ -348,17 +377,17 @@ Ken Prows (perl@xev.net)
 
 Please let me know if any of the below links are broken.
 
-Java2
+Java2: 
 L<http://java.sun.com/j2se/>
 
-Java.pm:
+Java.pm: 
 L<http://search.cpan.org/perldoc?Java>
 
-SourceForge page for Java.pm/JavaServer:
+SourceForge page for Java.pm/JavaServer: 
 L<http://sourceforge.net/projects/javaserver/>
 
-FOP:
-L<http://xml.apache.org/fop/>
+FOP: 
+L<http://xmlgraphics.apache.org/fop/>
 
 =head1 COPYRIGHT and LICENSE
 
