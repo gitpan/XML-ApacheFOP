@@ -1,6 +1,6 @@
 package XML::ApacheFOP;
 use strict;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -20,6 +20,9 @@ XML::ApacheFOP - Access Apache FOP from Perl to create PDF files using XSL-FO.
     
     # create a PostScript file using an xsl-fo file
     $Fop->fop(fo=>"foo.fo", outfile=>"temp3.ps", rendertype=>"ps") || die "cannot create ps file: " . $Fop->errstr;
+	
+	# reset FOP's image cache (available starting with FOP version 0.20.5)
+	$Fop->reset_image_cache() || die "could not reset FOP's image cache: " . $Fop->errstr;
 
 =head1 DESCRIPTION
 
@@ -333,6 +336,36 @@ sub fop
   return 1;
 }
 
+=head2 reset_image_cache
+
+Instruct FOP to clear its image cache.  This method is available 
+starting with FOP version 0.20.5. For more information, see 
+L<http://xmlgraphics.apache.org/fop/graphics.html#caching>
+
+Will return 1 on success. Will return undef on failure, in which case
+the error message will be accessible via $Fop->errstr.
+
+=cut
+
+sub reset_image_cache
+{
+  my $Self = shift;
+  
+  $Self->{'errstr'} = "";
+  
+  warn "resetting FOP image cache" if $Self->{debug};
+  eval { $Self->{_java}->org_apache_fop_image_FopImageFactory('resetCache') };
+  return $Self->_eval_error("could not reset FOP image cache") if $@;
+  
+  return 1;
+}
+
+=head2 errstr
+
+Will return an error message if the previous $Fop method call failed.
+
+=cut
+
 sub errstr
 {
   my $Self = shift;
@@ -388,6 +421,10 @@ L<http://sourceforge.net/projects/javaserver/>
 
 FOP: 
 L<http://xmlgraphics.apache.org/fop/>
+
+Ken Neighbors has created Debian packages for Java.pm/JavaServer and XML::ApacheFOP.
+This greatly eases the installation for the Debian platform:
+L<http://www.nsds.com/software/>
 
 =head1 COPYRIGHT and LICENSE
 

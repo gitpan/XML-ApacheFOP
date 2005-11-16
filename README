@@ -1,4 +1,4 @@
-XML-ApacheFOP version 0.02
+XML-ApacheFOP version 0.03
 ==========================
 
 XML::ApacheFOP allows you to use the Apache foundation's
@@ -100,6 +100,13 @@ com.zzo.javaserver.JavaServer
 Once the JavaServer is running you will be ready to start using XML::ApacheFOP.
 See the pod documentation for details on the interface usage.
 
+DEBIAN INSTALLATION
+
+Ken Neighbors has created Debian packages for Java.pm/JavaServer and XML::ApacheFOP.
+This greatly eases the installation for the Debian platform.
+
+You can get them at:
+http://www.nsds.com/software/
 
 SECURITY
 
